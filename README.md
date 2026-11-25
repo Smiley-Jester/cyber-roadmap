@@ -1,3 +1,45 @@
-# Cyber Path
+# Cyber Path — نقشه‌راه تعاملی امنیت سایبری
 
-Interactive Persian cybersecurity learning roadmap built with React and Vite. Full project files are being added in the initial project commit.
+یک داشبورد فارسی، واکنش‌گرا و Local-first برای پیگیری مسیر یادگیری امنیت سایبری از سطح مبتدی تا تحلیل دفاعی و مهندسی معکوس.
+
+## قابلیت‌ها
+- نقشه‌راه ۱۹ فصلی با ترتیب پیش‌نیازها، اولویت، معیار عبور و تمرین
+- منابع اصلی منتخب و لینک مستقیم
+- تفکیک زمان برنامهٔ مطالعه/تمرین از زمان محتوای منابع
+- محاسبهٔ خودکار پیشرفت فصل‌ها و کل برنامه
+- Stopwatch و Study Timer با ذخیرهٔ timestamp
+- ثبت تاریخچهٔ جلسه‌های مطالعه
+- نگهداری پیشرفت و تنظیمات در LocalStorage مرورگر
+- رابط Dark و Responsive با React و lucide-react
+
+## شروع محلی
+نیازمند Node.js نسخهٔ 20.19+ یا 22.12+ است.
+
+```bash
+npm install
+npm run dev
+```
+
+ساخت نسخهٔ production:
+
+```bash
+npm run build
+npm run preview
+```
+
+## انتشار در GitHub Pages
+فایل workflow در `.github/workflows/deploy.yml` قرار دارد. پس از Push به شاخهٔ `main`، GitHub Actions وابستگی‌ها را نصب می‌کند، پروژه را با Vite می‌سازد و پوشهٔ `dist` را Deploy می‌کند.
+
+در Repository به مسیر **Settings → Pages** برو و Source را روی **GitHub Actions** قرار بده.
+
+آدرس پروژه:
+https://Smiley-Jester.github.io/cyber-roadmap/
+
+## داده‌ها و حریم خصوصی
+هیچ Backend یا حساب کاربری لازم نیست. اطلاعات پیشرفت و تاریخچه فقط در LocalStorage همان مرورگر ذخیره می‌شوند؛ بین دستگاه‌ها همگام‌سازی نمی‌شوند. پاک کردن داده‌های سایت در مرورگر، اطلاعات محلی را حذف می‌کند.
+
+## چارچوب اخلاقی
+تمام تمرین‌ها برای سیستم شخصی، کد خودساخته، دادهٔ ساختگی، CTF یا آزمایشگاه آموزشی مجاز طراحی شده‌اند. در بخش تحقیق آسیب‌پذیری، گزارش و اصلاح مسئولانه هدف است. بخش Reverse Engineering و Malware Analysis دفاعی و ایستا است و اجرای فایل ناشناس، ساخت یا انتشار بدافزار و آزمایش سامانه‌های واقعی در این پروژه جایی ندارد.
+
+## فناوری‌ها
+React · Vite · JavaScript · lucide-react · CSS · LocalStorage
