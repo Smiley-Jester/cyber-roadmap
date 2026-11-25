@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Menu, Bell, ShieldCheck, ExternalLink } from 'lucide-react';
 import { roadmap } from './data/roadmap';
 import { usePersistentState } from './hooks/usePersistentState';
+import { playAlarm, unlockAudio } from './utils/alarm';
 import { estimateFinish, getModuleProgress } from './utils/progress';
 import Sidebar from './components/Sidebar';
 import Overview from './components/Overview';
@@ -134,6 +135,7 @@ export default function App() {
 
   const startTimer = () => {
     if (timer.status === 'running') return;
+    unlockAudio();
     const remaining = timer.status === 'paused' ? timer.remainingMs : timerDuration;
     setTimer((current) => ({
       ...current,
@@ -158,6 +160,7 @@ export default function App() {
     if (timer.status !== 'running' || !timer.endAt || Date.now() < timer.endAt) return;
     if (handledTimerEnd.current === timer.endAt) return;
     handledTimerEnd.current = timer.endAt;
+    playAlarm();
 
     if (timer.phase === 'focus') {
       recordSession('focus', timer.focusMinutes);
