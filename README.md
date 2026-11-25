@@ -1,45 +1,45 @@
-# Cyber Path — نقشه‌راه تعاملی امنیت سایبری
+# Cyber Path — Interactive Cybersecurity Roadmap
 
-یک داشبورد فارسی، واکنش‌گرا و Local-first برای پیگیری مسیر یادگیری امنیت سایبری از سطح مبتدی تا تحلیل دفاعی و مهندسی معکوس.
+A Persian-language (RTL), responsive, local-first dashboard for tracking a cybersecurity learning path, from beginner level through defensive analysis and reverse engineering.
 
-## قابلیت‌ها
-- نقشه‌راه ۱۹ فصلی با ترتیب پیش‌نیازها، اولویت، معیار عبور و تمرین
-- منابع اصلی منتخب و لینک مستقیم
-- تفکیک زمان برنامهٔ مطالعه/تمرین از زمان محتوای منابع
-- محاسبهٔ خودکار پیشرفت فصل‌ها و کل برنامه
-- Stopwatch و Study Timer با ذخیرهٔ timestamp
-- ثبت تاریخچهٔ جلسه‌های مطالعه
-- نگهداری پیشرفت و تنظیمات در LocalStorage مرورگر
-- رابط Dark و Responsive با React و lucide-react
+## Features
+- A 19-chapter roadmap with prerequisite ordering, priority, pass criteria, and exercises
+- Curated main resources with direct links
+- Planned study/practice time kept separate from the length of the resource content
+- Automatic progress calculation for each chapter and for the whole plan
+- Stopwatch and Study Timer with saved timestamps
+- Study session history log
+- Progress and settings stored in the browser's LocalStorage
+- Dark, responsive interface built with React and lucide-react
 
-## شروع محلی
-نیازمند Node.js نسخهٔ 20.19+ یا 22.12+ است.
+## Getting started locally
+Requires Node.js 20.19+ or 22.12+.
 
 ```bash
 npm install
 npm run dev
 ```
 
-ساخت نسخهٔ production:
+Build the production version:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## انتشار در GitHub Pages
-فایل workflow در `.github/workflows/deploy.yml` قرار دارد. پس از Push به شاخهٔ `main`، GitHub Actions وابستگی‌ها را نصب می‌کند، پروژه را با Vite می‌سازد و پوشهٔ `dist` را Deploy می‌کند.
+## Deploying to GitHub Pages
+The workflow file lives in `.github/workflows/deploy.yml`. After a push to the `main` branch, GitHub Actions installs the dependencies, builds the project with Vite, and deploys the `dist` folder.
 
-در Repository به مسیر **Settings → Pages** برو و Source را روی **GitHub Actions** قرار بده.
+In the repository, go to **Settings → Pages** and set the Source to **GitHub Actions**.
 
-آدرس پروژه:
+Project URL:
 https://Smiley-Jester.github.io/cyber-roadmap/
 
-## داده‌ها و حریم خصوصی
-هیچ Backend یا حساب کاربری لازم نیست. اطلاعات پیشرفت و تاریخچه فقط در LocalStorage همان مرورگر ذخیره می‌شوند؛ بین دستگاه‌ها همگام‌سازی نمی‌شوند. پاک کردن داده‌های سایت در مرورگر، اطلاعات محلی را حذف می‌کند.
+## Data and privacy
+No backend or user account is required. Progress and history are stored only in the LocalStorage of the browser you use; they are not synced between devices. Clearing the site's data in your browser deletes the locally stored information.
 
-## چارچوب اخلاقی
-تمام تمرین‌ها برای سیستم شخصی، کد خودساخته، دادهٔ ساختگی، CTF یا آزمایشگاه آموزشی مجاز طراحی شده‌اند. در بخش تحقیق آسیب‌پذیری، گزارش و اصلاح مسئولانه هدف است. بخش Reverse Engineering و Malware Analysis دفاعی و ایستا است و اجرای فایل ناشناس، ساخت یا انتشار بدافزار و آزمایش سامانه‌های واقعی در این پروژه جایی ندارد.
+## Ethical framework
+All exercises are designed to be done on your own system, with code you wrote yourself, with fake data, in CTFs, or in educational labs. In vulnerability research, the goal is responsible disclosure and remediation. The Reverse Engineering and Malware Analysis sections are defensive and static: running unknown files, building or distributing malware, and testing real systems have no place in this project.
 
-## فناوری‌ها
+## Tech stack
 React · Vite · JavaScript · lucide-react · CSS · LocalStorage
