@@ -6,7 +6,7 @@ import {
 import ProgressBar from './ProgressBar';
 import { formatHours, formatMinutes } from '../utils/progress';
 
-const stages = ['مبانی', 'سیستم‌ها و برنامه‌نویسی', 'امنیت و کاربرد', 'تخصص‌گرایی', 'پروژه و تثبیت'];
+const stages = ['مبانی', 'سیستم‌ها و برنامه‌نویسی', 'امنیت و کاربرد', 'هک اخلاقی در آزمایشگاه مجاز', 'تخصص‌گرایی', 'پروژه و تثبیت'];
 
 export default function Roadmap({ modules, onToggleLesson, activeModuleId, onSetActiveModule }) {
   const [expanded, setExpanded] = useState(() => ({ foundations: true }));
@@ -15,7 +15,7 @@ export default function Roadmap({ modules, onToggleLesson, activeModuleId, onSet
   return (
     <div className="page-stack">
       <section className="page-intro">
-        <div><span className="section-kicker">CURRICULUM MAP / 01—19</span><h1>نقشهٔ راه یادگیری</h1><p>ترتیب فصل‌ها بر اساس پیش‌نیازهای واقعی چیده شده است؛ فصل قفل‌شده تا تکمیل پیش‌نیازها باز نمی‌شود.</p></div>
+        <div><span className="section-kicker">CURRICULUM MAP / 01—35</span><h1>نقشهٔ راه یادگیری</h1><p>ترتیب فصل‌ها بر اساس پیش‌نیازهای واقعی چیده شده است؛ فصل قفل‌شده تا تکمیل پیش‌نیازها باز نمی‌شود.</p></div>
         <div className="intro-stat"><strong>{modules.length.toLocaleString('fa-IR')}</strong><span>فصل ساختارمند</span></div>
       </section>
 
