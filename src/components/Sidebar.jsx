@@ -1,5 +1,5 @@
 import {
-  Activity, BarChart3, BookOpen, Clock3, LayoutDashboard, Route, ShieldCheck,
+  Activity, BarChart3, BookOpen, Clock3, Compass, LayoutDashboard, Route, ShieldCheck,
 } from 'lucide-react';
 
 const items = [
@@ -7,6 +7,7 @@ const items = [
   { id: 'roadmap', label: 'نقشهٔ راه', icon: Route },
   { id: 'courses', label: 'پیگیری دوره‌ها', icon: BookOpen },
   { id: 'focus', label: 'مرکز تمرکز', icon: Clock3 },
+  { id: 'guide', label: 'راهنمای تمرین', icon: Compass },
   { id: 'stats', label: 'آمار و گزارش', icon: BarChart3 },
 ];
 

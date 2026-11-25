@@ -9,9 +9,10 @@ import Roadmap from './components/Roadmap';
 import CourseTracker from './components/CourseTracker';
 import FocusCenter from './components/FocusCenter';
 import Stats from './components/Stats';
+import Guide from './components/Guide';
 
 const pageTitles = {
-  overview: 'نمای کلی', roadmap: 'نقشهٔ راه', courses: 'پیگیری دوره‌ها', focus: 'مرکز تمرکز', stats: 'آمار و گزارش',
+  overview: 'نمای کلی', roadmap: 'نقشهٔ راه', courses: 'پیگیری دوره‌ها', focus: 'مرکز تمرکز', guide: 'راهنمای تمرین', stats: 'آمار و گزارش',
 };
 
 const defaultStopwatch = { elapsedMs: 0, startedAt: null };
@@ -203,6 +204,7 @@ export default function App() {
     if (activePage === 'roadmap') {
       return <Roadmap modules={modules} onToggleLesson={toggleLesson} activeModuleId={safeActiveModuleId} onSetActiveModule={setActiveModule} />;
     }
+    if (activePage === 'guide') return <Guide currentStage={nextModule?.stage} />;
     if (activePage === 'courses') return <CourseTracker modules={modules} />;
     if (activePage === 'focus') return (
       <FocusCenter
