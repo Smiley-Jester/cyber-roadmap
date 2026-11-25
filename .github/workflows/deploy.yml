@@ -7,18 +7,15 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# Never cancel a running deployment; let it finish and queue the next one.
 concurrency:
   group: 'pages'
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # Job 1: build the site and upload it as the "github-pages" artifact.
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,6 +40,20 @@ jobs:
         with:
           path: './dist'
 
+  # Job 2: deploy the uploaded artifact.
+  # This must be a separate job: running deploy-pages in the same job, right
+  # after the upload, can fail with 'No artifacts named "github-pages" were
+  # found' because the artifact is not listed yet when it looks for it.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
