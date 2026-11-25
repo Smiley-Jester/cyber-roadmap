@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Menu, Bell, ShieldCheck, ExternalLink } from 'lucide-react';
-import { roadmap, totalPlanHours } from './data/roadmap';
+import { roadmap } from './data/roadmap';
 import { usePersistentState } from './hooks/usePersistentState';
 import { estimateFinish, getModuleProgress } from './utils/progress';
 import Sidebar from './components/Sidebar';
@@ -33,6 +33,7 @@ export default function App() {
   const [stopwatch, setStopwatch] = usePersistentState('cyber-roadmap-stopwatch-v1', defaultStopwatch);
   const [timer, setTimer] = usePersistentState('cyber-roadmap-focus-timer-v1', defaultTimer);
   const [activeModuleId, setActiveModuleId] = usePersistentState('cyber-roadmap-active-module-v1', { value: 'foundations' });
+  const [view, setView] = usePersistentState('cyber-roadmap-view-v1', { coreOnly: false });
   const handledTimerEnd = useRef(null);
 
   useEffect(() => {
@@ -41,16 +42,20 @@ export default function App() {
   }, []);
 
   const modules = useMemo(() => {
+    const visible = roadmap.filter((module) => !(view.coreOnly && module.priority === 'تکمیلی'));
+    const visibleIds = new Set(visible.map((module) => module.id));
     const completionById = new Map();
-    roadmap.forEach((module) => completionById.set(module.id, getModuleProgress(module, progressState.lessons || {}).isComplete));
+    visible.forEach((module) => completionById.set(module.id, getModuleProgress(module, progressState.lessons || {}).isComplete));
 
-    return roadmap.map((module) => {
+    return visible.map((module) => {
+      // In core-only mode, hidden optional chapters never block a visible chapter.
+      const prerequisites = module.prerequisites.filter((id) => visibleIds.has(id));
       const moduleProgress = getModuleProgress(module, progressState.lessons || {});
-      const missingPrerequisites = module.prerequisites
+      const missingPrerequisites = prerequisites
         .filter((id) => !completionById.get(id))
         .map((id) => roadmap.find((item) => item.id === id))
         .filter(Boolean);
-      const isUnlocked = module.prerequisites.every((id) => completionById.get(id));
+      const isUnlocked = prerequisites.every((id) => completionById.get(id));
       return {
         ...module,
         progress: {
@@ -62,7 +67,9 @@ export default function App() {
         status: moduleProgress.isComplete ? 'complete' : isUnlocked ? 'available' : 'locked',
       };
     });
-  }, [progressState.lessons]);
+  }, [progressState.lessons, view.coreOnly]);
+
+  const totalPlanHours = modules.reduce((sum, module) => sum + module.totalHours, 0);
 
   const completedPlanHours = modules.reduce((sum, module) => sum + module.progress.completedPlanHours, 0);
   const overallPercent = (completedPlanHours / totalPlanHours) * 100;
@@ -254,6 +261,10 @@ export default function App() {
             <div className="breadcrumbs"><span>CYBER PATH</span><i>/</i><strong>{pageTitles[activePage]}</strong></div>
           </div>
           <div className="topbar-end">
+            <div className="view-toggle" role="group" aria-label="نمایش مسیر">
+              <button type="button" className={!view.coreOnly ? 'active' : ''} aria-pressed={!view.coreOnly} onClick={() => setView({ coreOnly: false })}>همهٔ فصل‌ها</button>
+              <button type="button" className={view.coreOnly ? 'active' : ''} aria-pressed={view.coreOnly} onClick={() => setView({ coreOnly: true })}>فقط مسیر اصلی</button>
+            </div>
             <div className="local-save-status"><span className="save-dot" /> ذخیره روی همین دستگاه</div>
             <div className="topbar-avatar"><ShieldCheck size={17} /></div>
           </div>

@@ -240,3 +240,8 @@ a { color: inherit; }
   .stage-stat-heading strong { font-size: 10px; }.history-item small { min-width: auto; max-width: 80px; }.history-item { gap: 8px; }.history-item-main span { max-width: 160px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+.view-toggle { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--line-strong); border-radius: 10px; background: #0f1821; }
+.view-toggle button { border: 0; border-radius: 7px; padding: 6px 12px; font: inherit; font-size: 11px; color: #8495a6; background: transparent; cursor: pointer; }
+.view-toggle button.active { color: var(--accent-strong); background: #162634; }
+@media (max-width: 760px) { .view-toggle button { padding: 5px 8px; font-size: 10px; } .local-save-status { display: none; } }
