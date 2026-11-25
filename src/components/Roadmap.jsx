@@ -15,7 +15,7 @@ export default function Roadmap({ modules, onToggleLesson, activeModuleId, onSet
   return (
     <div className="page-stack">
       <section className="page-intro">
-        <div><span className="section-kicker">CURRICULUM MAP / 01—35</span><h1>نقشهٔ راه یادگیری</h1><p>ترتیب فصل‌ها بر اساس پیش‌نیازهای واقعی چیده شده است؛ فصل قفل‌شده تا تکمیل پیش‌نیازها باز نمی‌شود.</p></div>
+        <div><span className="section-kicker">CURRICULUM MAP / 01—42</span><h1>نقشهٔ راه یادگیری</h1><p>ترتیب فصل‌ها بر اساس پیش‌نیازهای واقعی چیده شده است؛ فصل قفل‌شده تا تکمیل پیش‌نیازها باز نمی‌شود.</p></div>
         <div className="intro-stat"><strong>{modules.length.toLocaleString('fa-IR')}</strong><span>فصل ساختارمند</span></div>
       </section>
 
