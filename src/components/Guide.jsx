@@ -57,23 +57,27 @@ const platforms = {
   },
 };
 
+// Isolate English phrases so they don't scramble the order of Persian sentences.
+const LATIN = /([A-Za-z0-9](?:[A-Za-z0-9.+#'/-]*[A-Za-z0-9+#])?(?:(?: |: )[A-Za-z0-9](?:[A-Za-z0-9.+#'/-]*[A-Za-z0-9+#])?)*)/;
+const T = (text) => text.split(LATIN).map((part, i) => (i % 2 ? <bdi dir="ltr" key={i}>{part}</bdi> : part));
+
 function List({ items }) {
-  return <ul className="guide-list">{items.map((item) => <li key={item}>{item}</li>)}</ul>;
+  return <ul className="guide-list">{items.map((item) => <li key={item}>{T(item)}</li>)}</ul>;
 }
 
 function Platform({ data }) {
   return (
     <div className="page-stack">
       <section className="panel guide-panel">
-        <div className="panel-heading"><div><span className="section-kicker">PLATFORM GUIDE</span><h2>{data.name} چیست؟</h2></div></div>
-        <p className="guide-text">{data.what}</p>
+        <div className="panel-heading"><div><span className="section-kicker">PLATFORM GUIDE</span><h2>{T(`${data.name} چیست؟`)}</h2></div></div>
+        <p className="guide-text">{T(data.what)}</p>
         <div className="detail-columns">
           <div className="detail-block"><span className="detail-label">در نسخهٔ رایگان چه داری؟</span><List items={data.free} /></div>
           <div className="detail-block"><span className="detail-label">از کجا شروع کنم؟ (به ترتیب)</span><List items={data.start} /></div>
           <div className="detail-block"><span className="detail-label">چطور درست یاد بگیرم؟</span><List items={data.how} /></div>
         </div>
-        <div className="resource-note"><Info size={13} /> {data.note}</div>
-        <div className="resource-links"><a href={data.url} target="_blank" rel="noreferrer">باز کردن {data.name} <ExternalLink size={14} /></a></div>
+        <div className="resource-note"><Info size={13} /> {T(data.note)}</div>
+        <div className="resource-links"><a href={data.url} target="_blank" rel="noreferrer">{T(`باز کردن ${data.name}`)} <ExternalLink size={14} /></a></div>
       </section>
     </div>
   );
@@ -84,12 +88,12 @@ export default function Guide({ currentStage }) {
   return (
     <div className="page-stack">
       <section className="page-intro">
-        <div><span className="section-kicker">PRACTICE GUIDE</span><h1>راهنمای تمرین و ماندگاری</h1><p>چطور در مسیر بمانی، در هر مرحله چه کاری انجام بدهی و از TryHackMe و Hack The Box چطور استفاده کنی.</p></div>
+        <div><span className="section-kicker">PRACTICE GUIDE</span><h1>راهنمای تمرین و ماندگاری</h1><p>{T('چطور در مسیر بمانی، در هر مرحله چه کاری انجام بدهی و از TryHackMe و Hack The Box چطور استفاده کنی.')}</p></div>
       </section>
 
       <div className="guide-tabs" role="tablist" aria-label="بخش‌های راهنما">
         {tabs.map((item) => (
-          <button key={item.id} type="button" role="tab" aria-selected={tab === item.id} className={tab === item.id ? 'active' : ''} onClick={() => setTab(item.id)}>{item.label}</button>
+          <button key={item.id} type="button" role="tab" aria-selected={tab === item.id} className={tab === item.id ? 'active' : ''} onClick={() => setTab(item.id)}>{T(item.label)}</button>
         ))}
       </div>
 
@@ -98,7 +102,7 @@ export default function Guide({ currentStage }) {
           <section className="panel guide-panel">
             <div className="panel-heading"><div><span className="section-kicker">STAY IN THE GAME</span><h2>چطور رها نکنم؟</h2></div><Lightbulb size={19} className="subtle-icon" /></div>
             <div className="detail-columns">
-              {habits.map(([title, text]) => <div className="detail-block" key={title}><span className="detail-label">{title}</span><p>{text}</p></div>)}
+              {habits.map(([title, text]) => <div className="detail-block" key={title}><span className="detail-label">{T(title)}</span><p>{T(text)}</p></div>)}
             </div>
           </section>
 
@@ -107,11 +111,11 @@ export default function Guide({ currentStage }) {
             <div className="guide-stage-list">
               {stageGuides.map((item, index) => (
                 <article className={`guide-stage ${currentStage === item.stage ? 'guide-stage-current' : ''}`} key={item.stage}>
-                  <div className="guide-stage-head"><span className="stage-count">۰{index + 1}</span><h3>{item.stage}</h3>{currentStage === item.stage && <span className="guide-current-tag">مرحلهٔ فعلی تو</span>}</div>
-                  <p className="guide-text">{item.goal}</p>
+                  <div className="guide-stage-head"><span className="stage-count">۰{index + 1}</span><h3>{T(item.stage)}</h3>{currentStage === item.stage && <span className="guide-current-tag">مرحلهٔ فعلی تو</span>}</div>
+                  <p className="guide-text">{T(item.goal)}</p>
                   <span className="detail-label">کارهای عملی</span>
                   <List items={item.do} />
-                  <div className="practice-panel"><div className="practice-heading"><Flag size={16} /><strong>نشانهٔ آمادگی برای مرحلهٔ بعد</strong></div><p>{item.done}</p></div>
+                  <div className="practice-panel"><div className="practice-heading"><Flag size={16} /><strong>نشانهٔ آمادگی برای مرحلهٔ بعد</strong></div><p>{T(item.done)}</p></div>
                 </article>
               ))}
             </div>
