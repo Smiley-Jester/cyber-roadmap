@@ -105,11 +105,11 @@ export default function Overview({
 
       <section className="panel stage-overview-panel">
         <div className="panel-heading">
-          <div><span className="section-kicker">LEARNING PHASES</span><h2>پنج مرحلهٔ یادگیری</h2></div>
+          <div><span className="section-kicker">LEARNING PHASES</span><h2>شش مرحلهٔ یادگیری</h2></div>
           <button className="text-button" onClick={onGoRoadmap}>تمام فصل‌ها <ArrowLeft size={14} /></button>
         </div>
         <div className="stage-list">
-          {['مبانی', 'سیستم‌ها و برنامه‌نویسی', 'امنیت و کاربرد', 'تخصص‌گرایی', 'پروژه و تثبیت'].map((stage, index) => {
+          {['مبانی', 'سیستم‌ها و برنامه‌نویسی', 'امنیت و کاربرد', 'هک اخلاقی در آزمایشگاه مجاز', 'تخصص‌گرایی', 'پروژه و تثبیت'].map((stage, index) => {
             const stageModules = modules.filter((item) => item.stage === stage);
             const done = stageModules.reduce((sum, item) => sum + item.lessons.filter((lessonItem) => item.progress?.completedIds?.includes(lessonItem.id)).length, 0);
             const total = stageModules.reduce((sum, item) => sum + item.lessons.length, 0);
