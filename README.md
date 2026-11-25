@@ -3,7 +3,7 @@
 A Persian-language (RTL), responsive, local-first dashboard for tracking a cybersecurity learning path, from beginner level through defensive analysis and reverse engineering.
 
 ## Features
-- A 35-chapter roadmap in six phases, ordered by prerequisites, with priority (critical / important / optional), pass criteria, exercises, and video links where available
+- A 42-chapter roadmap in six phases, ordered by prerequisites, with priority (critical / important / optional), pass criteria, exercises, and video links where available
 - Curated main resources with direct links
 - Planned study/practice time kept separate from the length of the resource content
 - Automatic progress calculation for each chapter and for the whole plan
@@ -39,7 +39,7 @@ https://Smiley-Jester.github.io/cyber-roadmap/
 No backend or user account is required. Progress and history are stored only in the LocalStorage of the browser you use; they are not synced between devices. Clearing the site's data in your browser deletes the locally stored information.
 
 ## Ethical framework
-All exercises are designed to be done on your own system, with code you wrote yourself, with fake data, in CTFs, or in educational labs. In vulnerability research, the goal is responsible disclosure and remediation. Offensive-security chapters (Nmap, Burp Suite, Metasploit, privilege escalation, Active Directory) are for your own isolated lab (build it in the Home Lab chapter), deliberately vulnerable machines, or official training platforms only. The malware chapters are static by default; the optional behavioral-analysis chapter uses only the workshop’s own training samples inside an isolated VM. Running unknown files, building or distributing malware, and testing real systems without written authorization have no place in this project.
+All exercises are designed to be done on your own system, with code you wrote yourself, with fake data, in CTFs, or in educational labs. In vulnerability research, the goal is responsible disclosure and remediation. Offensive-security chapters (Nmap, Burp Suite, API testing, Wi-Fi, Metasploit, privilege escalation, Active Directory) are for your own isolated lab (build it in the Home Lab chapter), deliberately vulnerable machines, or official training platforms only. The malware chapters are static by default; the optional behavioral-analysis chapter uses only the workshop’s own training samples inside an isolated VM. Running unknown files, building or distributing malware, and testing real systems without written authorization have no place in this project.
 
 ## Tech stack
 React · Vite · JavaScript · lucide-react · CSS · LocalStorage
