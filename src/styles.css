@@ -289,3 +289,23 @@ a { color: inherit; }
 .practice-now dt { color: #799a98; font-size: 9px; font-weight: 700; }
 .practice-now dd { margin: 2px 0 0; color: #95a4b2; font-size: 10px; line-height: 1.9; }
 @media (max-width: 760px) { .chapter-track { padding: 0 12px 10px; } .practice-now dd, .video-list li { font-size: 9px; } }
+
+.lesson-block { display: flex; flex-direction: column; }
+.lesson-links { margin: 2px 14px 10px 0; padding-right: 14px; border-right: 2px solid rgba(130,168,200,.28); display: flex; flex-direction: column; gap: 8px; }
+.lesson-links .video-list { margin: 0; }
+.video-list li { flex-direction: row; gap: 8px; align-items: flex-start; }
+.item-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.item-check { position: relative; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.item-check input { position: absolute; opacity: 0; width: 0; height: 0; }
+.item-check input:checked + .custom-check { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
+.practice-check h4 { margin: 0; }
+.practice-done { opacity: .75; }
+.video-ts { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.video-ts a { color: #8fb3ad; text-decoration: none; }
+.video-candidate { flex-direction: column !important; gap: 3px; padding: 8px 10px; border: 1px dashed var(--line-strong); border-radius: 8px; }
+.video-candidate code { color: #738497; font-size: 9px; word-break: break-all; }
+.practice-now details summary { cursor: pointer; color: #8fb3ad; font-size: 10px; margin-top: 6px; }
+.guide-box details { margin-top: 8px; font-size: 10px; color: #91a1b0; }
+.guide-box summary { cursor: pointer; color: #b6c8cf; }
+.guide-box p { margin: 6px 0 0; line-height: 2; }
+.chapter-track span { font-size: 10px; color: #8495a6; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; }

@@ -3,7 +3,7 @@ import { Menu, Bell, ShieldCheck, ExternalLink } from 'lucide-react';
 import { roadmap } from './data/roadmap';
 import { usePersistentState, subscribeSaveStatus } from './hooks/usePersistentState';
 import { playAlarm, unlockAudio } from './utils/alarm';
-import { clamp, estimateFinish, getModuleProgress, percentOf } from './utils/progress';
+import { clamp, estimateFinish, getModuleProgress, percentOf, trackingSummary } from './utils/progress';
 import Sidebar from './components/Sidebar';
 import Overview from './components/Overview';
 import Roadmap from './components/Roadmap';
@@ -11,6 +11,13 @@ import CourseTracker from './components/CourseTracker';
 import FocusCenter from './components/FocusCenter';
 import Stats from './components/Stats';
 import Guide from './components/Guide';
+
+// Each tracked item (video or practice) belongs to one chapter; keys look like v:<id> / p:<id>.
+const itemOwner = new Map();
+roadmap.forEach((chapter) => {
+  (chapter.videos || []).forEach((video) => itemOwner.set(`v:${video.id}`, chapter.id));
+  (chapter.practiceNow || []).forEach((item) => itemOwner.set(`p:${item.id}`, chapter.id));
+});
 
 const pageTitles = {
   overview: 'نمای کلی', roadmap: 'نقشهٔ راه', courses: 'پیگیری دوره‌ها', focus: 'مرکز تمرکز', guide: 'راهنمای تمرین', stats: 'آمار و گزارش',
@@ -142,18 +149,12 @@ export default function App() {
   // Separate tracking for "watched the videos" and "did the hands-on practice" per chapter.
   const extras = progressState.extras || {};
   const toggleExtra = (key) => {
-    const module = modules.find((item) => key.startsWith(`${item.id}:`));
+    const module = modules.find((item) => item.id === itemOwner.get(key));
     if (!module || module.status === 'locked') return;
     setProgressState((current) => ({ ...current, extras: { ...(current.extras || {}), [key]: !current.extras?.[key] } }));
   };
-  const trackingOf = (suffix, has) => {
-    const list = roadmap.filter(has);
-    return { done: list.filter((module) => extras[`${module.id}:${suffix}`]).length, total: list.length };
-  };
-  const tracking = {
-    videos: trackingOf('video', (module) => module.videos?.some((video) => video.url)),
-    practice: trackingOf('practice', (module) => module.practiceNow?.length > 0),
-  };
+  // Old chapter-level flags (<id>:video / <id>:practice) stay in storage untouched and are no longer counted.
+  const tracking = trackingSummary(roadmap, extras);
 
   const startStopwatch = () => {
     if (stopwatch.startedAt) return;
@@ -265,7 +266,7 @@ export default function App() {
         const known = new Set(roadmap.flatMap((module) => module.lessons.map((lesson) => lesson.id)));
         const clean = Object.fromEntries(Object.entries(lessons).filter(([id, done]) => done === true && known.has(id)));
         const items = Array.isArray(data.sessions?.items) ? data.sessions.items.filter((item) => item && Number.isFinite(item.minutes) && item.minutes > 0) : [];
-        const cleanExtras = Object.fromEntries(Object.entries(data.progress.extras || {}).filter(([key, done]) => done === true && /:(video|practice)$/.test(key) && roadmap.some((module) => key.startsWith(`${module.id}:`))));
+        const cleanExtras = Object.fromEntries(Object.entries(data.progress.extras || {}).filter(([key, done]) => done === true && (itemOwner.has(key) || /^[a-z0-9-]+:(video|practice)$/.test(key))));
         setProgressState({ lessons: clean, extras: cleanExtras });
         setSessions({ items });
         if (Number(data.settings?.weeklyHours) > 0) setWeeklyHours(data.settings.weeklyHours);

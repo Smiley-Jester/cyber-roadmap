@@ -58,8 +58,11 @@ export default function Stats({ modules, sessions, overallPercent, corePercent, 
           <div className="completion-row"><span>درس‌های تکمیل‌شده</span><strong>{modules.reduce((sum, item) => sum + item.progress.completedCount, 0).toLocaleString('fa-IR')} / {modules.reduce((sum, item) => sum + item.progress.totalCount, 0).toLocaleString('fa-IR')}</strong></div>
           <div className="completion-row"><span>فصل‌های کامل</span><strong>{modules.filter((item) => item.progress.isComplete).length.toLocaleString('fa-IR')} / {modules.length.toLocaleString('fa-IR')}</strong></div>
           <div className="completion-row"><span>پیشرفت محتوای منابع</span><strong>{Math.round(percentOf(modules.reduce((sum, item) => sum + item.progress.completedContentMinutes, 0), modules.reduce((sum, item) => sum + item.source.contentMinutes, 0)))}٪</strong></div>
-          <div className="completion-row"><span>ویدیوها دیده‌شده (فصل‌ها)</span><strong>{tracking.videos.done} از {tracking.videos.total}</strong></div>
-          <div className="completion-row"><span>تمرین‌های عملی انجام‌شده (فصل‌ها)</span><strong>{tracking.practice.done} از {tracking.practice.total}</strong></div>
+          <div className="completion-row"><span>ویدیوهای ضروری دیده‌شده</span><strong>{tracking.videos.done.toLocaleString('fa-IR')} از {tracking.videos.total.toLocaleString('fa-IR')}</strong></div>
+          <div className="completion-row"><span>ویدیوهای اختیاری دیده‌شده</span><strong>{tracking.optionalVideos.done.toLocaleString('fa-IR')} از {tracking.optionalVideos.total.toLocaleString('fa-IR')}</strong></div>
+          <div className="completion-row"><span>تمرین‌های عملی انجام‌شده</span><strong>{tracking.practice.done.toLocaleString('fa-IR')} از {tracking.practice.total.toLocaleString('fa-IR')}</strong></div>
+          <div className="completion-row"><span>تمرین‌های باقی‌مانده</span><strong>{(tracking.practice.total - tracking.practice.done).toLocaleString('fa-IR')}</strong></div>
+          {tracking.practice.remaining.length > 0 && <div className="completion-note">بعدی‌ها: {tracking.practice.remaining.slice(0, 3).join('، ')}</div>}
           <div className="completion-note">تخمین زمان پایان بر اساس ساعت‌های باقی‌ماندهٔ برنامه است؛ روزهای تعطیل و تغییر سرعت یادگیری می‌توانند تاریخ واقعی را جابه‌جا کنند.</div>
         </div>
       </section>
