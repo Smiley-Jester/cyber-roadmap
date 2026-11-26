@@ -51,3 +51,18 @@ export function estimateFinish(completedPlanHours, totalHours, weeklyHours = 12)
 export function formatDate(timestamp) {
   return new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(timestamp));
 }
+
+// A video counts toward mandatory progress only if it is a real, non-optional video with a clickable link.
+export const isCountedVideo = (video) => video.kind !== 'docs' && !video.optional && Boolean(video.url) && video.status !== 'review' && !video.refId;
+
+export function trackingSummary(chapters, extras) {
+  const videos = chapters.flatMap((chapter) => (chapter.videos || []).filter(isCountedVideo));
+  const optionalVideos = chapters.flatMap((chapter) => (chapter.videos || []).filter((video) => video.optional && video.url && video.status !== 'review' && !video.refId && video.kind !== 'docs'));
+  const practice = chapters.flatMap((chapter) => (chapter.practiceNow || []));
+  const donePractice = practice.filter((item) => extras[`p:${item.id}`]);
+  return {
+    videos: { done: videos.filter((video) => extras[`v:${video.id}`]).length, total: videos.length },
+    optionalVideos: { done: optionalVideos.filter((video) => extras[`v:${video.id}`]).length, total: optionalVideos.length },
+    practice: { done: donePractice.length, total: practice.length, remaining: practice.filter((item) => !extras[`p:${item.id}`]).map((item) => item.name) },
+  };
+}
