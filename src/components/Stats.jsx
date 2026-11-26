@@ -2,7 +2,7 @@ import { BarChart3, CalendarDays, CheckCircle2, Clock3, Download, TrendingUp, Up
 import ProgressBar from './ProgressBar';
 import { formatDate, formatHours, formatMinutes, percentOf } from '../utils/progress';
 
-export default function Stats({ modules, sessions, overallPercent, corePercent, weeklyHours, completedPlanHours, totalHours, finishEstimate, onExport, onImport, dataMessage }) {
+export default function Stats({ modules, sessions, overallPercent, corePercent, weeklyHours, completedPlanHours, totalHours, finishEstimate, tracking, onExport, onImport, dataMessage }) {
   const totalMinutes = sessions.reduce((sum, session) => sum + session.minutes, 0);
   const stageNames = [...new Set(modules.map((item) => item.stage))];
   const stageStats = stageNames.map((stage) => {
@@ -58,6 +58,8 @@ export default function Stats({ modules, sessions, overallPercent, corePercent, 
           <div className="completion-row"><span>درس‌های تکمیل‌شده</span><strong>{modules.reduce((sum, item) => sum + item.progress.completedCount, 0).toLocaleString('fa-IR')} / {modules.reduce((sum, item) => sum + item.progress.totalCount, 0).toLocaleString('fa-IR')}</strong></div>
           <div className="completion-row"><span>فصل‌های کامل</span><strong>{modules.filter((item) => item.progress.isComplete).length.toLocaleString('fa-IR')} / {modules.length.toLocaleString('fa-IR')}</strong></div>
           <div className="completion-row"><span>پیشرفت محتوای منابع</span><strong>{Math.round(percentOf(modules.reduce((sum, item) => sum + item.progress.completedContentMinutes, 0), modules.reduce((sum, item) => sum + item.source.contentMinutes, 0)))}٪</strong></div>
+          <div className="completion-row"><span>ویدیوها دیده‌شده (فصل‌ها)</span><strong>{tracking.videos.done} از {tracking.videos.total}</strong></div>
+          <div className="completion-row"><span>تمرین‌های عملی انجام‌شده (فصل‌ها)</span><strong>{tracking.practice.done} از {tracking.practice.total}</strong></div>
           <div className="completion-note">تخمین زمان پایان بر اساس ساعت‌های باقی‌ماندهٔ برنامه است؛ روزهای تعطیل و تغییر سرعت یادگیری می‌توانند تاریخ واقعی را جابه‌جا کنند.</div>
         </div>
       </section>
