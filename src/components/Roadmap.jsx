@@ -8,7 +8,10 @@ import { formatHours, formatMinutes } from '../utils/progress';
 
 const stages = ['مبانی', 'سیستم‌ها و برنامه‌نویسی', 'امنیت و کاربرد', 'هک اخلاقی در آزمایشگاه مجاز', 'تخصص‌گرایی', 'پروژه و تثبیت'];
 
-export default function Roadmap({ modules, onToggleLesson, activeModuleId, onSetActiveModule }) {
+const videoLabels = { supplied: 'لینک ارائه‌شده؛ هنوز بررسی نشده', review: 'ویدیو هنوز تأیید نشده', official: 'منبع رسمی' };
+const practiceFields = [['tasks', 'Taskها'], ['teaches', 'چه یاد می‌گیری'], ['do', 'چه کار کنی'], ['prereq', 'پیش‌نیاز'], ['time', 'زمان'], ['access', 'دسترسی'], ['challenge', 'Mini Challenge'], ['done', 'معیار تکمیل']];
+
+export default function Roadmap({ modules, onToggleLesson, activeModuleId, onSetActiveModule, extras = {}, onToggleExtra }) {
   const [expanded, setExpanded] = useState(() => ({ foundations: true }));
   const grouped = useMemo(() => stages.map((stage) => ({ stage, modules: modules.filter((item) => item.stage === stage) })), [modules]);
 
@@ -65,6 +68,12 @@ export default function Roadmap({ modules, onToggleLesson, activeModuleId, onSet
                       <ProgressBar value={module.progress.percent} showValue />
                       <span className="chapter-lesson-count">{module.progress.completedCount} / {module.progress.totalCount} درس</span>
                     </div>
+                    {(module.videos?.some((video) => video.url) || module.practiceNow?.length > 0) && (
+                      <div className="chapter-track">
+                        {module.videos?.some((video) => video.url) && <button type="button" disabled={isLocked} className={`track-chip ${extras[`${module.id}:video`] ? 'on' : ''}`} aria-pressed={Boolean(extras[`${module.id}:video`])} onClick={() => onToggleExtra(`${module.id}:video`)}><PlayCircle size={13} /> ویدیوها را دیدم</button>}
+                        {module.practiceNow?.length > 0 && <button type="button" disabled={isLocked} className={`track-chip ${extras[`${module.id}:practice`] ? 'on' : ''}`} aria-pressed={Boolean(extras[`${module.id}:practice`])} onClick={() => onToggleExtra(`${module.id}:practice`)}><Flag size={13} /> تمرین عملی را انجام دادم</button>}
+                      </div>
+                    )}
 
                     {isLocked && (
                       <div className="lock-hint"><LockKeyhole size={14} /><span>پیش‌نیازهای باقی‌مانده: {module.missingPrerequisites.map((item) => `فصل ${item.number}`).join('، ')}</span></div>
@@ -109,11 +118,36 @@ export default function Roadmap({ modules, onToggleLesson, activeModuleId, onSet
                             {module.source.note && <div className="resource-note"><Info size={13} /> {module.source.note}</div>}
                             <div className="resource-links">
                               <a href={module.source.url} target="_blank" rel="noreferrer">باز کردن منبع اصلی <ExternalLink size={14} /></a>
-                              {module.source.videoUrl && <a href={module.source.videoUrl} target="_blank" rel="noreferrer">ویدیوی مستقیم YouTube <ArrowUpRight size={14} /></a>}
                               {module.source.secondaryUrl && <a href={module.source.secondaryUrl} target="_blank" rel="noreferrer">{module.source.secondaryTitle} <ExternalLink size={14} /></a>}
                             </div>
                           </div>
                         </div>
+
+                        <div className="video-panel">
+                          <div className="practice-heading"><PlayCircle size={16} /><strong>ویدیوها</strong></div>
+                          {module.videos?.length ? (
+                            <ul className="video-list">
+                              {module.videos.map((video) => (
+                                <li key={video.title}>
+                                  {video.url ? <a dir="ltr" href={video.url} target="_blank" rel="noreferrer">{video.title} <ArrowUpRight size={13} /></a> : <span dir="ltr">{video.title}</span>}
+                                  <small>{[video.author, video.duration, video.optional ? 'اختیاری' : ''].filter(Boolean).join(' · ')}</small>
+                                  {video.timestamps && <small dir="ltr" className="video-ts">{video.timestamps.map(([time, label]) => `${time} ${label}`).join(' · ')}</small>}
+                                  <span className={`video-badge video-${video.status}`}>{videoLabels[video.status]}</span>
+                                  {video.note && <small>{video.note}</small>}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : <span className="video-badge video-review">ویدیو هنوز تأیید نشده</span>}
+                        </div>
+
+                        {module.practiceNow?.map((item) => (
+                          <div className="practice-now" key={item.name}>
+                            <div className="practice-heading"><Flag size={16} /><strong>Practice Now</strong><span className="practice-platform">{item.platform}{item.local ? ' · محلی' : ''}</span></div>
+                            <h4 dir="auto">{item.url ? <a href={item.url} target="_blank" rel="noreferrer">{item.name} <ExternalLink size={13} /></a> : item.name}</h4>
+                            {item.tool && <p className="practice-tool"><strong>ابزار:</strong> {item.tool}</p>}
+                            <dl>{practiceFields.map(([key, label]) => item[key] && <div key={key}><dt>{label}</dt><dd>{item[key]}</dd></div>)}</dl>
+                          </div>
+                        ))}
 
                         <div className="practice-panel">
                           <div className="practice-heading"><Flag size={16} /><strong>تمرین / پروژهٔ کوچک</strong></div>

@@ -1,8 +1,8 @@
-import { BarChart3, CalendarDays, CheckCircle2, Clock3, TrendingUp } from 'lucide-react';
+import { BarChart3, CalendarDays, CheckCircle2, Clock3, Download, TrendingUp, Upload } from 'lucide-react';
 import ProgressBar from './ProgressBar';
-import { formatDate, formatHours, formatMinutes } from '../utils/progress';
+import { formatDate, formatHours, formatMinutes, percentOf } from '../utils/progress';
 
-export default function Stats({ modules, sessions, overallPercent, completedPlanHours, totalHours, finishEstimate }) {
+export default function Stats({ modules, sessions, overallPercent, corePercent, weeklyHours, completedPlanHours, totalHours, finishEstimate, tracking, onExport, onImport, dataMessage }) {
   const totalMinutes = sessions.reduce((sum, session) => sum + session.minutes, 0);
   const stageNames = [...new Set(modules.map((item) => item.stage))];
   const stageStats = stageNames.map((stage) => {
@@ -23,13 +23,13 @@ export default function Stats({ modules, sessions, overallPercent, completedPlan
     <div className="page-stack">
       <section className="page-intro">
         <div><span className="section-kicker">ANALYTICS / LEARNING RECORD</span><h1>آمار و گزارش</h1><p>پیشرفت آموزشی از روی درس‌های تکمیل‌شده و زمان واقعی از روی جلسه‌های ثبت‌شده محاسبه می‌شود.</p></div>
-        <div className="intro-stat"><strong>{Math.round(overallPercent)}٪</strong><span>پیشرفت وزنی</span></div>
+        <div className="intro-stat"><strong>{Math.round(overallPercent)}٪</strong><span>پیشرفت وزنی · مسیر اصلی {Math.round(corePercent)}٪</span></div>
       </section>
 
       <section className="metric-grid stats-metrics">
         <div className="metric-card"><div className="metric-icon"><TrendingUp size={18} /></div><div className="metric-copy"><span className="metric-label">ساعت برنامهٔ تکمیل‌شده</span><strong className="metric-value">{formatHours(completedPlanHours)}</strong><span className="metric-sub">از {formatHours(totalHours)}</span></div></div>
         <div className="metric-card"><div className="metric-icon"><Clock3 size={18} /></div><div className="metric-copy"><span className="metric-label">زمان واقعی مطالعه</span><strong className="metric-value">{formatHours(totalMinutes / 60)}</strong><span className="metric-sub">{sessions.length.toLocaleString('fa-IR')} جلسهٔ ثبت‌شده</span></div></div>
-        <div className="metric-card"><div className="metric-icon"><CalendarDays size={18} /></div><div className="metric-copy"><span className="metric-label">زمان تخمینی باقی‌مانده</span><strong className="metric-value">{finishEstimate.months.toFixed(1)} ماه</strong><span className="metric-sub">با ۱۲ ساعت در هفته</span></div></div>
+        <div className="metric-card"><div className="metric-icon"><CalendarDays size={18} /></div><div className="metric-copy"><span className="metric-label">زمان تخمینی باقی‌مانده</span><strong className="metric-value">{finishEstimate.months.toFixed(1)} ماه</strong><span className="metric-sub">با {weeklyHours.toLocaleString('fa-IR')} ساعت در هفته</span></div></div>
       </section>
 
       <section className="panel stage-stats-panel">
@@ -57,8 +57,19 @@ export default function Stats({ modules, sessions, overallPercent, completedPlan
           <div className="panel-heading"><div><span className="section-kicker">COMPLETION</span><h2>نشانگرهای مسیر</h2></div><CheckCircle2 size={18} className="subtle-icon" /></div>
           <div className="completion-row"><span>درس‌های تکمیل‌شده</span><strong>{modules.reduce((sum, item) => sum + item.progress.completedCount, 0).toLocaleString('fa-IR')} / {modules.reduce((sum, item) => sum + item.progress.totalCount, 0).toLocaleString('fa-IR')}</strong></div>
           <div className="completion-row"><span>فصل‌های کامل</span><strong>{modules.filter((item) => item.progress.isComplete).length.toLocaleString('fa-IR')} / {modules.length.toLocaleString('fa-IR')}</strong></div>
-          <div className="completion-row"><span>پیشرفت محتوای منابع</span><strong>{Math.round(modules.reduce((sum, item) => sum + item.progress.completedContentMinutes, 0) / modules.reduce((sum, item) => sum + item.source.contentMinutes, 0) * 100)}٪</strong></div>
+          <div className="completion-row"><span>پیشرفت محتوای منابع</span><strong>{Math.round(percentOf(modules.reduce((sum, item) => sum + item.progress.completedContentMinutes, 0), modules.reduce((sum, item) => sum + item.source.contentMinutes, 0)))}٪</strong></div>
+          <div className="completion-row"><span>ویدیوها دیده‌شده (فصل‌ها)</span><strong>{tracking.videos.done} از {tracking.videos.total}</strong></div>
+          <div className="completion-row"><span>تمرین‌های عملی انجام‌شده (فصل‌ها)</span><strong>{tracking.practice.done} از {tracking.practice.total}</strong></div>
           <div className="completion-note">تخمین زمان پایان بر اساس ساعت‌های باقی‌ماندهٔ برنامه است؛ روزهای تعطیل و تغییر سرعت یادگیری می‌توانند تاریخ واقعی را جابه‌جا کنند.</div>
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel-heading"><div><span className="section-kicker">BACKUP</span><h2>پشتیبان‌گیری از پیشرفت</h2></div></div>
+        <div className="data-actions">
+          <button type="button" className="button button-secondary" onClick={onExport}><Download size={15} /> خروجی JSON</button>
+          <label className="button button-secondary data-import"><Upload size={15} /> بازیابی از فایل<input type="file" accept="application/json,.json" onChange={(event) => { onImport(event.target.files?.[0]); event.target.value = ''; }} /></label>
+          {dataMessage && <span className="small-muted" role="status">{dataMessage}</span>}
         </div>
       </section>
 

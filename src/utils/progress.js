@@ -1,5 +1,8 @@
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
+// Safe percentage: never NaN or Infinity when the total is zero.
+export const percentOf = (part, total) => (total > 0 ? clamp((part / total) * 100) : 0);
+
 export function formatMinutes(totalMinutes = 0) {
   const safe = Math.max(0, Math.round(totalMinutes));
   const hours = Math.floor(safe / 60);
@@ -33,14 +36,14 @@ export function getModuleProgress(module, completedLessons = {}) {
     completedPlanHours,
     percent: module.lessons.length ? (completed.length / module.lessons.length) * 100 : 0,
     completedContentMinutes,
-    contentPercent: module.source.contentMinutes ? (completedContentMinutes / module.source.contentMinutes) * 100 : 0,
+    contentPercent: percentOf(completedContentMinutes, module.source.contentMinutes),
     isComplete: completed.length === module.lessons.length,
   };
 }
 
 export function estimateFinish(completedPlanHours, totalHours, weeklyHours = 12) {
   const remainingHours = Math.max(0, totalHours - completedPlanHours);
-  const weeks = remainingHours / weeklyHours;
+  const weeks = remainingHours / Math.max(1, weeklyHours);
   const months = weeks / 4.345;
   return { remainingHours, weeks, months };
 }
