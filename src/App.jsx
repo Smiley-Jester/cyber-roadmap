@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Menu, Bell, ShieldCheck, ExternalLink } from 'lucide-react';
 import { roadmap } from './data/roadmap';
-import { usePersistentState } from './hooks/usePersistentState';
+import { usePersistentState, subscribeSaveStatus } from './hooks/usePersistentState';
 import { playAlarm, unlockAudio } from './utils/alarm';
-import { estimateFinish, getModuleProgress } from './utils/progress';
+import { clamp, estimateFinish, getModuleProgress, percentOf } from './utils/progress';
 import Sidebar from './components/Sidebar';
 import Overview from './components/Overview';
 import Roadmap from './components/Roadmap';
@@ -36,12 +36,29 @@ export default function App() {
   const [timer, setTimer] = usePersistentState('cyber-roadmap-focus-timer-v1', defaultTimer);
   const [activeModuleId, setActiveModuleId] = usePersistentState('cyber-roadmap-active-module-v1', { value: 'foundations' });
   const [view, setView] = usePersistentState('cyber-roadmap-view-v1', { coreOnly: false });
+  const [settings, setSettings] = usePersistentState('cyber-roadmap-settings-v1', { weeklyHours: 12 });
+  const [saveOk, setSaveOk] = useState(true);
+  const [dataMessage, setDataMessage] = useState('');
+  const weeklyHours = clamp(Number(settings.weeklyHours) || 12, 1, 80);
   const handledTimerEnd = useRef(null);
 
+  useEffect(() => subscribeSaveStatus(setSaveOk), []);
+
+  // Re-render once a second only while the Focus page shows a running clock.
+  const clockRunning = Boolean(stopwatch.startedAt) || timer.status === 'running';
   useEffect(() => {
-    const interval = window.setInterval(() => setClockTick(Date.now()), 250);
+    if (!clockRunning || activePage !== 'focus') return undefined;
+    setClockTick(Date.now());
+    const interval = window.setInterval(() => setClockTick(Date.now()), 1000);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [clockRunning, activePage]);
+
+  // Wake up exactly when the timer ends, even if another page is open.
+  useEffect(() => {
+    if (timer.status !== 'running' || !timer.endAt) return undefined;
+    const id = window.setTimeout(() => setClockTick(Date.now()), Math.max(0, timer.endAt - Date.now()) + 50);
+    return () => window.clearTimeout(id);
+  }, [timer.status, timer.endAt]);
 
   const modules = useMemo(() => {
     const visible = roadmap.filter((module) => !(view.coreOnly && module.priority === 'تکمیلی'));
@@ -71,13 +88,22 @@ export default function App() {
     });
   }, [progressState.lessons, view.coreOnly]);
 
+  // Hours of the chapters currently shown (used for remaining time and the finish estimate).
   const totalPlanHours = modules.reduce((sum, module) => sum + module.totalHours, 0);
-
   const completedPlanHours = modules.reduce((sum, module) => sum + module.progress.completedPlanHours, 0);
-  const overallPercent = (completedPlanHours / totalPlanHours) * 100;
+
+  // Overall progress always uses ALL chapters; core progress is shown separately.
+  const doneHoursOf = (list) => list.reduce((sum, module) => sum + getModuleProgress(module, progressState.lessons || {}).completedPlanHours, 0);
+  const hoursOf = (list) => list.reduce((sum, module) => sum + module.totalHours, 0);
+  const coreModules = roadmap.filter((module) => module.priority !== 'تکمیلی');
+  const overall = { completedHours: doneHoursOf(roadmap), totalHours: hoursOf(roadmap) };
+  overall.percent = percentOf(overall.completedHours, overall.totalHours);
+  const corePercent = percentOf(doneHoursOf(coreModules), hoursOf(coreModules));
+  const overallPercent = overall.percent;
+  const planMonths = estimateFinish(0, overall.totalHours, weeklyHours).months;
   const completedChapters = modules.filter((module) => module.progress.isComplete).length;
   const actualStudyMinutes = sessions.items.reduce((sum, session) => sum + session.minutes, 0);
-  const finishEstimate = estimateFinish(completedPlanHours, totalPlanHours, 12);
+  const finishEstimate = estimateFinish(completedPlanHours, totalPlanHours, weeklyHours);
   const nextModule = modules.find((module) => module.status === 'available');
   const nextLesson = nextModule?.lessons.find((lesson) => !progressState.lessons?.[lesson.id]);
   const nextStep = nextModule && nextLesson ? { module: nextModule, lesson: nextLesson } : null;
@@ -199,6 +225,40 @@ export default function App() {
     }));
   };
 
+  const setWeeklyHours = (raw) => setSettings({ weeklyHours: clamp(Number(raw) || 1, 1, 80) });
+
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify({ app: 'cyber-roadmap', version: 1, progress: progressState, sessions, settings, view }, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'cyber-roadmap-progress.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importData = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(String(reader.result));
+        const lessons = data?.progress?.lessons;
+        if (data?.app !== 'cyber-roadmap' || !lessons || typeof lessons !== 'object') throw new Error('invalid file');
+        const known = new Set(roadmap.flatMap((module) => module.lessons.map((lesson) => lesson.id)));
+        const clean = Object.fromEntries(Object.entries(lessons).filter(([id, done]) => done === true && known.has(id)));
+        const items = Array.isArray(data.sessions?.items) ? data.sessions.items.filter((item) => item && Number.isFinite(item.minutes) && item.minutes > 0) : [];
+        setProgressState({ lessons: clean });
+        setSessions({ items });
+        if (Number(data.settings?.weeklyHours) > 0) setWeeklyHours(data.settings.weeklyHours);
+        setDataMessage('داده‌ها با موفقیت بازیابی شد.');
+      } catch {
+        setDataMessage('فایل معتبر نیست؛ چیزی تغییر نکرد.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const setActiveModule = (id) => setActiveModuleId({ value: id });
   const activeModule = modules.find((module) => module.id === activeModuleId.value);
   const safeActiveModuleId = activeModule && activeModule.status !== 'locked' ? activeModuleId.value : (nextModule?.id || 'foundations');
@@ -235,15 +295,25 @@ export default function App() {
         modules={modules}
         sessions={sessions.items || []}
         overallPercent={overallPercent}
+        corePercent={corePercent}
+        weeklyHours={weeklyHours}
         completedPlanHours={completedPlanHours}
         totalHours={totalPlanHours}
         finishEstimate={finishEstimate}
+        onExport={exportData}
+        onImport={importData}
+        dataMessage={dataMessage}
       />
     );
     return (
       <Overview
         modules={modules}
         overallPercent={overallPercent}
+        overall={overall}
+        corePercent={corePercent}
+        planMonths={planMonths}
+        weeklyHours={weeklyHours}
+        onSetWeeklyHours={setWeeklyHours}
         totalHours={totalPlanHours}
         completedPlanHours={completedPlanHours}
         actualStudyMinutes={actualStudyMinutes}
@@ -270,7 +340,7 @@ export default function App() {
               <button type="button" className={!view.coreOnly ? 'active' : ''} aria-pressed={!view.coreOnly} onClick={() => setView({ coreOnly: false })}>همهٔ فصل‌ها</button>
               <button type="button" className={view.coreOnly ? 'active' : ''} aria-pressed={view.coreOnly} onClick={() => setView({ coreOnly: true })}>فقط مسیر اصلی</button>
             </div>
-            <div className="local-save-status"><span className="save-dot" /> ذخیره روی همین دستگاه</div>
+            <div className={`local-save-status ${saveOk ? '' : 'save-failed'}`}><span className="save-dot" /> {saveOk ? 'ذخیره روی همین دستگاه' : 'ذخیره نشد؛ حافظهٔ مرورگر در دسترس نیست'}</div>
             <div className="topbar-avatar"><ShieldCheck size={17} /></div>
           </div>
         </header>

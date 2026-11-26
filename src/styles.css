@@ -258,3 +258,12 @@ a { color: inherit; }
 .guide-stage-head h3 { margin: 0; color: #dbe7e4; font-size: 13px; font-weight: 600; }
 .guide-current-tag { margin-right: auto; padding: 3px 9px; border-radius: 999px; color: var(--accent-strong); background: var(--accent-soft); font-size: 9px; }
 @media (max-width: 760px) { .guide-tabs button { padding: 7px 11px; font-size: 10px; } .guide-panel .guide-text, .guide-list { font-size: 9px; } }
+
+.local-save-status.save-failed { color: var(--danger); }
+.local-save-status.save-failed .save-dot { background: var(--danger); box-shadow: 0 0 0 4px rgba(193,126,122,.12); }
+@media (max-width: 760px) { .local-save-status.save-failed { display: flex; } }
+.weekly-input { display: inline-flex; align-items: center; gap: 6px; }
+.weekly-input input { width: 52px; padding: 2px 6px; border: 1px solid var(--line-strong); border-radius: 7px; color: var(--text); background: #0f1821; font: inherit; text-align: center; }
+.data-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.data-import { position: relative; cursor: pointer; }
+.data-import input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }

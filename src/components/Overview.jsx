@@ -19,7 +19,7 @@ function MetricCard({ icon: Icon, label, value, sub, accent = false }) {
 }
 
 export default function Overview({
-  modules, overallPercent, totalHours, completedPlanHours, actualStudyMinutes,
+  modules, overallPercent, overall, corePercent, planMonths, weeklyHours, onSetWeeklyHours, totalHours, completedPlanHours, actualStudyMinutes,
   completedChapters, finishEstimate, nextStep, onGoRoadmap, onGoFocus,
 }) {
   const remaining = Math.max(0, totalHours - completedPlanHours);
@@ -34,8 +34,8 @@ export default function Overview({
           <h1>از مبانی تا تحلیل‌گر امنیت</h1>
           <p>یک مسیر مرحله‌ای برای فهم عمیق سیستم‌ها، تحقیق مسئولانه و تحلیل دفاعی.</p>
           <div className="welcome-meta">
-            <span><CalendarClock size={15} /> حدود ۲۹ ماه</span>
-            <span><Clock3 size={15} /> ۲ ساعت در روز، ۶ روز در هفته</span>
+            <span><CalendarClock size={15} /> حدود {Math.max(1, Math.round(planMonths)).toLocaleString('fa-IR')} ماه</span>
+            <label className="weekly-input"><Clock3 size={15} /> <input type="number" min="1" max="80" value={weeklyHours} onChange={(event) => onSetWeeklyHours(event.target.value)} aria-label="ساعت مطالعه در هفته" /> ساعت در هفته</label>
             <span><ShieldCheck size={15} /> مسیر اخلاقی و آزمایشگاهی</span>
           </div>
           <button className="button button-primary" onClick={onGoRoadmap}>
@@ -53,7 +53,7 @@ export default function Overview({
       </section>
 
       <section className="metric-grid">
-        <MetricCard icon={Target} label="پیشرفت کل مسیر" value={`${Math.round(overallPercent)}٪`} sub={`${completedChapters} فصل از ${modules.length} فصل کامل`} accent />
+        <MetricCard icon={Target} label="پیشرفت کل مسیر" value={`${Math.round(overallPercent)}٪`} sub={`مسیر اصلی: ${Math.round(corePercent)}٪ · ${completedChapters} از ${modules.length} فصل کامل`} accent />
         <MetricCard icon={Flame} label="زمان ثبت‌شدهٔ مطالعه" value={formatHours(actualStudyMinutes / 60)} sub="از تایمرهای همین داشبورد" />
         <MetricCard icon={Hourglass} label="برآورد باقی‌مانده" value={formatHours(remaining)} sub={`${finishEstimate.months.toFixed(1)} ماه با برنامهٔ فعلی`} />
         <MetricCard icon={BookOpenCheck} label="برنامهٔ کل" value={`${totalHours.toLocaleString('fa-IR')} ساعت`} sub="مطالعه و تمرین، جدا از زمان ویدیو" />
@@ -96,7 +96,7 @@ export default function Overview({
             <div className="overall-ring" style={{ '--progress': `${overallPercent}%` }}>
               <div className="overall-ring-inner"><strong>{Math.round(overallPercent)}٪</strong><span>تکمیل شده</span></div>
             </div>
-            <div className="ring-copy"><strong>{formatHours(completedPlanHours)}</strong><span>از {formatHours(totalHours)}</span><p>پیشرفت وزنی بر اساس ساعت برنامه‌ریزی‌شدهٔ هر فصل</p></div>
+            <div className="ring-copy"><strong>{formatHours(overall.completedHours)}</strong><span>از {formatHours(overall.totalHours)}</span><p>پیشرفت وزنی بر اساس ساعت برنامه‌ریزی‌شدهٔ هر فصل</p></div>
           </div>
           <ProgressBar value={overallPercent} showValue />
           <div className="status-footnote"><span className="status-dot" /> فصل بعدی پس از تکمیل پیش‌نیازها باز می‌شود.</div>
