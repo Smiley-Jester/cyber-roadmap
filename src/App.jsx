@@ -134,8 +134,25 @@ export default function App() {
     const module = modules.find((item) => item.id === moduleId);
     if (!module || module.status === 'locked') return;
     setProgressState((current) => ({
+      ...current,
       lessons: { ...(current.lessons || {}), [lessonId]: !current.lessons?.[lessonId] },
     }));
+  };
+
+  // Separate tracking for "watched the videos" and "did the hands-on practice" per chapter.
+  const extras = progressState.extras || {};
+  const toggleExtra = (key) => {
+    const module = modules.find((item) => key.startsWith(`${item.id}:`));
+    if (!module || module.status === 'locked') return;
+    setProgressState((current) => ({ ...current, extras: { ...(current.extras || {}), [key]: !current.extras?.[key] } }));
+  };
+  const trackingOf = (suffix, has) => {
+    const list = roadmap.filter(has);
+    return { done: list.filter((module) => extras[`${module.id}:${suffix}`]).length, total: list.length };
+  };
+  const tracking = {
+    videos: trackingOf('video', (module) => module.videos?.some((video) => video.url)),
+    practice: trackingOf('practice', (module) => module.practiceNow?.length > 0),
   };
 
   const startStopwatch = () => {
@@ -248,7 +265,8 @@ export default function App() {
         const known = new Set(roadmap.flatMap((module) => module.lessons.map((lesson) => lesson.id)));
         const clean = Object.fromEntries(Object.entries(lessons).filter(([id, done]) => done === true && known.has(id)));
         const items = Array.isArray(data.sessions?.items) ? data.sessions.items.filter((item) => item && Number.isFinite(item.minutes) && item.minutes > 0) : [];
-        setProgressState({ lessons: clean });
+        const cleanExtras = Object.fromEntries(Object.entries(data.progress.extras || {}).filter(([key, done]) => done === true && /:(video|practice)$/.test(key) && roadmap.some((module) => key.startsWith(`${module.id}:`))));
+        setProgressState({ lessons: clean, extras: cleanExtras });
         setSessions({ items });
         if (Number(data.settings?.weeklyHours) > 0) setWeeklyHours(data.settings.weeklyHours);
         setDataMessage('داده‌ها با موفقیت بازیابی شد.');
@@ -265,7 +283,7 @@ export default function App() {
 
   const renderPage = () => {
     if (activePage === 'roadmap') {
-      return <Roadmap modules={modules} onToggleLesson={toggleLesson} activeModuleId={safeActiveModuleId} onSetActiveModule={setActiveModule} />;
+      return <Roadmap modules={modules} onToggleLesson={toggleLesson} activeModuleId={safeActiveModuleId} onSetActiveModule={setActiveModule} extras={extras} onToggleExtra={toggleExtra} />;
     }
     if (activePage === 'guide') return <Guide currentStage={nextModule?.stage} />;
     if (activePage === 'courses') return <CourseTracker modules={modules} />;
@@ -300,6 +318,7 @@ export default function App() {
         completedPlanHours={completedPlanHours}
         totalHours={totalPlanHours}
         finishEstimate={finishEstimate}
+        tracking={tracking}
         onExport={exportData}
         onImport={importData}
         dataMessage={dataMessage}
